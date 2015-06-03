@@ -1,0 +1,18 @@
+*** Settings ***
+Resource          全局变量.txt
+Resource          错误码.txt
+Library           Collections
+Library           RequestsLibrary
+
+*** Variables ***
+
+*** Test Cases ***
+营业员登陆成功
+    ${headers_base}=    Create Dictionary    x-app    ${x-app}    x-version    ${x-version}    x-deviceId
+    ...    ${x-deviceId}    x-sign    ${x-sign}
+    Create Session    MerchantLogin    ${host}    ${headers_base}
+    ${data}=    Create Dictionary    loginName    01400028    password    888888
+    ${resp}=    Post Request    MerchantLogin    /merchant/login.json    ${data}
+    Should Be Equal As Strings    ${resp.status_code}    200
+    ${resp_json}=    ${resp.json()}
+    Should Be Equal    ${resp_json['data']['cashier']}    ${data['loginName']}
