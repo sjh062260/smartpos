@@ -14,5 +14,8 @@ Library           RequestsLibrary
     ${data}=    Create Dictionary    loginName    01400028    password    888888
     ${resp}=    Post Request    MerchantLogin    /merchant/login.json    ${data}
     Should Be Equal As Strings    ${resp.status_code}    200
-    ${resp_json}=    ${resp.json()}
-    Should Be Equal    ${resp_json['data']['cashier']}    ${data['loginName']}
+    ${resp_data}    To Json    ${resp.content}
+    ${keys}    Get Dictionary Keys    ${resp_data}
+    ${items}    Get Dictionary Items    ${resp_data}
+    ${values}    Get Dictionary Values    ${resp_data}
+    ${str}    Get From Dictionary    ${resp_data}    data

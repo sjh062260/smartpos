@@ -11,12 +11,6 @@ pyload = {'loginName':'01400028','password':'888888'}
 
 resp = requests.post(url,data=pyload,headers=headers)
 resp_json = resp.json()
-data_dict = resp_json["data"]
+resp_data = json.loads(resp.content)
 
-print resp.text
-print(resp_json)
-print(type(resp_json))
-print(resp_json["data"])
-print(type(data_dict))
-print(data_dict['cashier'])
-print(resp_json['data']['cashier'])
+print(resp_data)
