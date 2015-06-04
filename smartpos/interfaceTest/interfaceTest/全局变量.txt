@@ -5,3 +5,4 @@ ${x-version}      10    # headers x-version
 ${x-deviceId}     k-201    # headers deviceId
 ${x-sign}         08216bc91cb64412848317903070f9e3    # headers sign
 ${Content-Type}    application/x-www-form-urlencoded
+${x-sessionId}    ${EMPTY}

@@ -1,0 +1,15 @@
+*** Settings ***
+Library           RequestsLibrary
+Library           Collections
+Resource          全局变量.txt
+
+*** Keywords ***
+营业员登陆
+    ${headers_base}=    Create Dictionary    x-app=${x-app}    x-version=${x-version}    x-deviceId=${x-deviceId}    x-sign=${x-sign}    Content-Type=${Content-Type}
+    Create Session    api    ${host}    ${headers_base}
+    ${loginData}=    Create Dictionary    loginName=01400028    password=888888
+    ${resp}=    Post Request    api    merchant/login.json    data=${loginData}
+    Comment    Should Be Equal As Strings    ${resp.status_code}    200
+    ${resp_data}=    To Json    ${resp.text}
+    ${responseData}    Get From Dictionary    ${resp_data}    data
+    Set Global Variable    ${x-sessionId}    ${responseData['sessionId']}

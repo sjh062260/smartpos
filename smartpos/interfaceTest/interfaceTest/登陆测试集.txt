@@ -7,6 +7,22 @@ Library           RequestsLibrary
 *** Variables ***
 
 *** Test Cases ***
+管理员登陆成功
+    ${headers_base}=    Create Dictionary    x-app=${x-app}    x-version=${x-version}    x-deviceId=${x-deviceId}    x-sign=${x-sign}    Content-Type=${Content-Type}
+    Create Session    api    ${host}    ${headers_base}
+    ${loginData}=    Create Dictionary    loginName=admin    password=123456
+    ${resp}=    Post Request    api    admin/login.json    data=${loginData}
+    Comment    Should Be Equal As Strings    ${resp.status_code}    200
+    ${resp_data}    To Json    ${resp.text}
+    ${keys}    Get Dictionary Keys    ${resp_data}
+    ${items}    Get Dictionary Items    ${resp_data}
+    ${values}    Get Dictionary Values    ${resp_data}
+    ${responseData}    Get From Dictionary    ${resp_data}    data
+    ${responseState}    Get From Dictionary    ${resp_data}    state
+    Should Be Equal As Strings    ${responseState['code']}    ${code_ok}
+    Should Be Equal As Strings    ${responseData['stationPre']}    133
+    Delete All Sessions
+
 营业员登陆成功
     ${headers_base}=    Create Dictionary    x-app=${x-app}    x-version=${x-version}    x-deviceId=${x-deviceId}    x-sign=${x-sign}    Content-Type=${Content-Type}
     Create Session    api    ${host}    ${headers_base}
@@ -21,3 +37,4 @@ Library           RequestsLibrary
     ${responseState}    Get From Dictionary    ${resp_data}    state
     Should Be Equal As Strings    ${responseState['code']}    ${code_ok}
     Should Be Equal As Strings    ${responseData['cashier']}    ${loginData['loginName']}
+    Delete All Sessions

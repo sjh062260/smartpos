@@ -1,0 +1,31 @@
+*** Settings ***
+Library           RequestsLibrary
+Library           Collections
+Resource          全局变量.txt
+Resource          返回码.txt
+Resource          flow.txt
+
+*** Test Cases ***
+交接班统计
+    ${headers_base}=    Create Dictionary    x-app=${x-app}    x-version=${x-version}    x-deviceId=${x-deviceId}    x-sign=${x-sign}    Content-Type=${Content-Type}
+    Create Session    api    ${host}    ${headers_base}
+    ${loginData}=    Create Dictionary    loginName=01400028    password=888888
+    ${resp_login}=    Post Request    api    merchant/login.json    data=${loginData}
+    Comment    Should Be Equal As Strings    ${resp_login.status_code}    200
+    ${resp_data}=    To Json    ${resp_login.text}
+    ${responseData}    Get From Dictionary    ${resp_data}    data
+    Set Global Variable    ${x-sessionId}    ${responseData['sessionId']}
+    ${headers_}=    Create Dictionary    x-app=${x-app}    x-version=${x-version}    x-deviceId=${x-deviceId}    x-sign=${x-sign}    Content-Type=${Content-Type}
+    ...    x-sessionId=${x-sessionId}
+    ${reqData}=    Create Dictionary    startTime=2015-05-10 00:00:00    endTime=2015-05-16 00:00:00
+    Create Session    handover    ${host}    ${headers}
+    ${resp_handover}=    Post Request    api    handover/statistics.json    data=${reqData}
+    Comment    Should Be Equal As Strings    ${resp_handover.status_code}    200
+    ${resp_handover_data}    To Json    ${resp_handover.text}
+    ${keys}    Get Dictionary Keys    ${resp_handover_data}
+    ${items}    Get Dictionary Items    ${resp_handover_data}
+    ${values}    Get Dictionary Values    ${resp_handover_data}
+    ${responseState}    Get From Dictionary    ${resp_handover_data}    state
+    Should Be Equal As Strings    ${responseState['code']}    ${code_ok}
+    ${str}    Get From Dictionary    ${resp_data}    goods
+    Delete All Sessions
