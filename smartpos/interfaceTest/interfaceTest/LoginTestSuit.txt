@@ -1,6 +1,6 @@
 *** Settings ***
 Resource          全局变量.txt
-Resource          错误码.txt
+Resource          返回码.txt
 Library           Collections
 Library           RequestsLibrary
 
@@ -8,14 +8,16 @@ Library           RequestsLibrary
 
 *** Test Cases ***
 营业员登陆成功
-    ${headers_base}=    Create Dictionary    x-app    ${x-app}    x-version    ${x-version}    x-deviceId
-    ...    ${x-deviceId}    x-sign    ${x-sign}
-    Create Session    MerchantLogin    ${host}    ${headers_base}
-    ${data}=    Create Dictionary    loginName    01400028    password    888888
-    ${resp}=    Post Request    MerchantLogin    /merchant/login.json    ${data}
-    Should Be Equal As Strings    ${resp.status_code}    200
-    ${resp_data}    To Json    ${resp.content}
+    ${headers_base}=    Create Dictionary    x-app=${x-app}    x-version=${x-version}    x-deviceId=${x-deviceId}    x-sign=${x-sign}    Content-Type=${Content-Type}
+    Create Session    api    ${host}    ${headers_base}
+    ${loginData}=    Create Dictionary    loginName=01400028    password=888888
+    ${resp}=    Post Request    api    merchant/login.json    data=${loginData}
+    Comment    Should Be Equal As Strings    ${resp.status_code}    200
+    ${resp_data}    To Json    ${resp.text}
     ${keys}    Get Dictionary Keys    ${resp_data}
     ${items}    Get Dictionary Items    ${resp_data}
     ${values}    Get Dictionary Values    ${resp_data}
-    ${str}    Get From Dictionary    ${resp_data}    data
+    ${responseData}    Get From Dictionary    ${resp_data}    data
+    ${responseState}    Get From Dictionary    ${resp_data}    state
+    Should Be Equal As Strings    ${responseState['code']}    ${code_ok}
+    Should Be Equal As Strings    ${responseData['cashier']}    ${loginData['loginName']}

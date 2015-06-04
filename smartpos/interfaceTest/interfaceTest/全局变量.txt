@@ -1,6 +1,7 @@
 *** Variables ***
-${host}           http://172.16.1.6:8080    # DEMO环境host
+${host}           http://172.16.1.201:8080/    # DEMO环境host
 ${x-app}          smart-pos    # headers x-app
 ${x-version}      10    # headers x-version
 ${x-deviceId}     k-201    # headers deviceId
 ${x-sign}         08216bc91cb64412848317903070f9e3    # headers sign
+${Content-Type}    application/x-www-form-urlencoded
