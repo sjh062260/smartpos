@@ -8,18 +8,36 @@ Resource          flow.txt
 *** Test Cases ***
 交接班统计
     营业员登陆会话
-    ${headers}=    Create Dictionary    x-app=${x-app}    x-version=${x-version}    x-deviceId=${x-deviceId}    x-sign=${x-sign}    Content-Type=${Content-Type}
+    ${headers_sessionId}=    Create Dictionary    x-app=${x-app}    x-version=${x-version}    x-deviceId=${x-deviceId}    x-sign=${x-sign}    Content-Type=${Content-Type}
     ...    x-sessionId=${x-sessionId}
     ${handoverData}=    Create Dictionary    startTime=2015-05-10 00:00:00    endTime=2015-05-16 00:00:00
-    Create Session    handover    ${host}    ${headers}
-    ${resp_handover}=    Post Request    handover    /handover/statistics.json    data=${handoverData}
-    Comment    Should Be Equal As Strings    ${resp_handover.status_code}    200
-    ${resp_handover_data}    To Json    ${resp_handover.text}
-    ${keys}    Get Dictionary Keys    ${resp_handover_data}
-    ${items}    Get Dictionary Items    ${resp_handover_data}
-    ${values}    Get Dictionary Values    ${resp_handover_data}
-    ${responseState}    Get From Dictionary    ${resp_handover_data}    state
+    Create Session    handover    ${host}    ${headers_sessionId}
+    ${resp}=    Post Request    handover    /handover/statistics.json    data=${handoverData}
+    Comment    Should Be Equal As Strings    ${resp.status_code}    200
+    ${resp_data}    To Json    ${resp.text}
+    ${keys}    Get Dictionary Keys    ${resp_data}
+    ${items}    Get Dictionary Items    ${resp_data}
+    ${values}    Get Dictionary Values    ${resp_data}
+    ${responseState}    Get From Dictionary    ${resp_data}    state
     Should Be Equal As Strings    ${responseState['code']}    ${code_ok}
-    ${str}    Get From Dictionary    ${resp_handover_data}    data
+    ${str}    Get From Dictionary    ${resp_data}    data
     Should Contain    ${str}    statistics
+    Delete All Sessions
+
+离线数据上传
+    营业员登陆会话
+    ${headers_sessionId}=    Create Dictionary    x-app=${x-app}    x-version=${x-version}    x-deviceId=${x-deviceId}    x-sign=${x-sign}    Content-Type=${Content-Type}
+    ...    x-sessionId=${x-sessionId}
+    ${syncData}=    Create Dictionary    data=[{"orderCount":0,"refundCount":0,"alipayRefundTotalFee": 0,"alipayTotalFee": 0,"cashOutTotalFee": 0,"cashInTotalFee": 0,"cashRefundTotalFee": 0,"cashSurplusTotalFee": 0,"cashTotalFee": 0,"cashierId": "cashierId","handoverNo": "handoverNo","handoverTime": 1431332275111,"loginTime": 1431332275111,"station": "station","unionpayRefundTotalFee": 0,"unionpayTotalFee": 0},{"orderCount":0,"refundCount":0,"alipayRefundTotalFee": 0,"alipayTotalFee": 0,"cashOutTotalFee": 0,"cashInTotalFee": 0,"cashRefundTotalFee": 0,"cashSurplusTotalFee": 0,"cashTotalFee": 0,"cashierId": "cashierId","handoverNo": "handoverNo2","handoverTime": 1431332275111,"loginTime": 1431332275111,"station": "station","unionpayRefundTotalFee": 0,"unionpayTotalFee": 0}]
+    Create Session    syncData    ${host}    ${headers_sessionId}
+    ${resp}=    Post Request    syncData    /handover/syncData.json    data=${syncData}
+    Comment    Should Be Equal As Strings    ${resp.status_code}    200
+    ${resp_data}    To Json    ${resp.text}
+    ${keys}    Get Dictionary Keys    ${resp_data}
+    ${items}    Get Dictionary Items    ${resp_data}
+    ${values}    Get Dictionary Values    ${resp_data}
+    ${responseState}    Get From Dictionary    ${resp_data}    state
+    Should Be Equal As Strings    ${responseState['code']}    ${code_ok}
+    ${str}    Get From Dictionary    ${resp_data}    data
+    Should Contain    ${str}    dataList
     Delete All Sessions
